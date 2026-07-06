@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Which Dork Diaries Character Are You?</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #ffb6d9, #b6e0ff);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .quiz-box {
+    background: #fff;
+    max-width: 600px;
+    width: 100%;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  }
+  h1 {
+    text-align: center;
+    color: #cb2338;
+    font-size: 26px;
+    margin-bottom: 5px;
+  }
+  .intro {
+    text-align: center;
+    color: #555;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+  .progress {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .question {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+  }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    background: #fafafa;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.15s ease;
+  }
+  .option:hover {
+    border-color: #cb2338;
+    background: #fff0f3;
+  }
+  #start-btn, #restart-btn {
+    display: block;
+    margin: 20px auto 0;
+    padding: 12px 30px;
+    background: #cb2338;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  #start-btn:hover, #restart-btn:hover { background: #a91c2e; }
+  .result-title {
+    text-align: center;
+    font-size: 24px;
+    color: #cb2338;
+    margin-bottom: 10px;
+  }
+  .result-desc {
+    text-align: center;
+    color: #444;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="quiz-box">
+
+  <div id="intro-screen">
+    <h1>Which Dork Diaries Character Are You?</h1>
+    <p class="intro">Ever wondered if you're more like Nikki or Mackenzie? Answer 10 quick questions to find out which Dork Diaries character matches your personality!</p>
+    <button id="start-btn">Take the Quiz</button>
+  </div>
+
+  <div id="quiz-screen" class="hidden">
+    <div class="progress" id="progress"></div>
+    <div class="question" id="question-text"></div>
+    <div id="options-container"></div>
+  </div>
+
+  <div id="result-screen" class="hidden">
+    <div class="result-title" id="result-title"></div>
+    <div class="result-desc" id="result-desc"></div>
+    <button id="restart-btn">Take It Again</button>
+  </div>
+
+</div>
+
+<script>
+  // Each question's options map 1-to-1, in order, to these 7 characters
+  const characters = ["Nikki", "Mackenzie", "Chloe", "Zoey", "Brandon", "Brianna", "Theo"];
+
+  const descriptions = {
+    "Nikki": "You're Nikki Maxwell! Creative, a little dorky, and fiercely loyal to your friends. You doodle your feelings, overthink everything, and somehow still come out on top.",
+    "Mackenzie": "You're Mackenzie Hollister! Confident, stylish, and always ready to compete for the top spot. You know exactly what you want and you're not afraid to go after it.",
+    "Chloe": "You're Chloe Garcia! Bubbly, warm, and the friend everyone wants on their team. You bring the fun energy wherever you go.",
+    "Zoey": "You're Zoey Franklin! Smart, thoughtful, and the voice of reason in the group. People come to you when they need real advice.",
+    "Brandon": "You're Brandon Roberts! Kind-hearted, artistic, and a little shy, but you always show up for the people (and animals) you care about.",
+    "Brianna": "You're Brianna Maxwell! Wildly imaginative, dramatic, and impossible not to smile around. You live in your own delightful world.",
+    "Theo": "You're Theo! Laid-back, musical, and easygoing. You go with the flow but you're always there when your friends need you."
+  };
+
+  const questions = [
+    {
+      text: "What's your idea of a perfect Saturday?",
+      options: ["Drawing in my diary", "Shopping for the newest trends", "Hanging out with friends at the mall", "Reading a good book", "Volunteering at an animal shelter", "Making up a wild imaginary game", "Practicing music with friends"]
+    },
+    {
+      text: "How do you handle a conflict with a friend?",
+      options: ["Write about it to sort out my feelings", "Make sure everyone knows I was right", "Talk it out with lots of hugs", "Calmly explain my side with facts", "Try to see both sides and stay kind", "Turn it into a dramatic story", "Shrug it off and stay chill"]
+    },
+    {
+      text: "Pick a comfort food.",
+      options: ["Cupcakes", "Something expensive and trendy", "Pizza with friends", "Tea and a snack while studying", "Homemade cookies", "Anything colorful and fun", "Whatever's easiest to share"]
+    },
+    {
+      text: "What's your fashion style?",
+      options: ["Quirky and creative", "Designer and on-trend", "Colorful and cute", "Comfortable and practical", "Simple and low-key", "Whatever matches my mood that day", "Casual with a cool accessory"]
+    },
+    {
+      text: "What are you usually known for at school?",
+      options: ["Being the artistic one", "Being popular and competitive", "Being everyone's best friend", "Being the smart one", "Being kind to everyone, even the shy kids", "Being hilarious and dramatic", "Being the music/band kid"]
+    },
+    {
+      text: "Your biggest fear is...",
+      options: ["Being embarrassed in front of everyone", "Losing the top spot", "Losing a close friend", "Failing a big test", "Letting someone down", "Being bored", "Missing out on something fun with friends"]
+    },
+    {
+      text: "Pick a weekend hangout spot.",
+      options: ["A cozy corner with a sketchbook", "The trendiest new store", "The mall food court with the girls", "The library", "The local animal shelter", "Anywhere I can make up a new game", "A friend's garage band practice"]
+    },
+    {
+      text: "What's your best subject?",
+      options: ["Art", "Whatever helps me stay on top socially", "I just enjoy being around people", "English or Science", "Anything involving animals or nature", "Drama or Creative Writing", "Music"]
+    },
+    {
+      text: "How would your friends describe you in one word?",
+      options: ["Dorky (in a good way)", "Confident", "Sweet", "Reliable", "Caring", "Imaginative", "Chill"]
+    },
+    {
+      text: "Your dream day would include...",
+      options: ["Finishing a great new diary entry", "Being noticed for something amazing", "A fun day out with your best friends", "Curling up with a good book and quiet time", "Helping someone or something in need", "An epic made-up adventure", "Jamming out with music"]
+    }
+  ];
+
+  let currentQuestion = 0;
+  let scores = {};
+  characters.forEach(c => scores[c] = 0);
+
+  const introScreen = document.getElementById("intro-screen");
+  const quizScreen = document.getElementById("quiz-screen");
+  const resultScreen = document.getElementById("result-screen");
+  const questionText = document.getElementById("question-text");
+  const optionsContainer = document.getElementById("options-container");
+  const progress = document.getElementById("progress");
+
+  document.getElementById("start-btn").addEventListener("click", startQuiz);
+  document.getElementById("restart-btn").addEventListener("click", restartQuiz);
+
+  function startQuiz() {
+    introScreen.classList.add("hidden");
+    quizScreen.classList.remove("hidden");
+    showQuestion();
+  }
+
+  function showQuestion() {
+    const q = questions[currentQuestion];
+    progress.textContent = "Question " + (currentQuestion + 1) + " of " + questions.length;
+    questionText.textContent = q.text;
+    optionsContainer.innerHTML = "";
+
+    q.options.forEach((optionText, index) => {
+      const btn = document.createElement("button");
+      btn.className = "option";
+      btn.textContent = optionText;
+      btn.addEventListener("click", () => selectAnswer(index));
+      optionsContainer.appendChild(btn);
+    });
+  }
+
+  function selectAnswer(index) {
+    const character = characters[index];
+    scores[character]++;
+    currentQuestion++;
+
+    if (currentQuestion < questions.length) {
+      showQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    quizScreen.classList.add("hidden");
+    resultScreen.classList.remove("hidden");
+
+    let winner = characters[0];
+    characters.forEach(c => {
+      if (scores[c] > scores[winner]) winner = c;
+    });
+
+    document.getElementById("result-title").textContent = "You're " + winner + "!";
+    document.getElementById("result-desc").textContent = descriptions[winner];
+  }
+
+  function restartQuiz() {
+    currentQuestion = 0;
+    characters.forEach(c => scores[c] = 0);
+    resultScreen.classList.add("hidden");
+    introScreen.classList.remove("hidden");
+  }
+</script>
+
+</body>
+</html>
